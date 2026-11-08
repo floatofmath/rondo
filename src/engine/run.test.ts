@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { evening, morning, routines } from '../model/seed';
+import { evening, morning, routines, study } from '../model/seed';
 import type { Routine } from '../model/types';
 import { formatDuration, formatRemaining } from './format';
 import {
@@ -571,7 +571,28 @@ describe('seed', () => {
     const ids = morning.steps.map((s) => s.id);
     expect(evening.steps.map((s) => s.id)).toEqual([...ids].reverse());
     expect(createRun(evening, T0).stepRuns.map((s) => s.stepId)).toEqual([...ids].reverse());
-    expect(routines).toEqual([morning, evening]);
+  });
+
+  it('has the study routine with the agreed durations in order', () => {
+    expect(study.steps.map((s) => [s.id, s.plannedSeconds])).toEqual([
+      ['prepare-materials', 300],
+      ['study-1', 900],
+      ['break', 300],
+      ['study-2', 900],
+      ['clean-up', 300],
+    ]);
+    expect(routinePlannedSeconds(study)).toBe(2700);
+  });
+
+  it('offers all routines, with unique ids and every minimum within its plan', () => {
+    expect(routines).toEqual([morning, evening, study]);
+    expect(new Set(routines.map((r) => r.id)).size).toBe(routines.length);
+    for (const routine of routines) {
+      expect(new Set(routine.steps.map((s) => s.id)).size).toBe(routine.steps.length);
+      for (const s of routine.steps) {
+        if (s.type === 'timed') expect(s.earliestDoneSeconds).toBeLessThanOrEqual(s.plannedSeconds);
+      }
+    }
   });
 });
 

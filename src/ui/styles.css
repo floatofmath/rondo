@@ -96,7 +96,7 @@ ul {
 
 /* Home */
 .home {
-  gap: 16px;
+  gap: 12px;
 }
 
 .routine-card {
@@ -104,10 +104,11 @@ ul {
   min-height: 0;
   display: grid;
   grid-template-columns: auto 1fr;
-  grid-template-rows: 1fr auto auto;
+  grid-template-rows: 1fr auto;
   align-items: center;
-  column-gap: 16px;
-  padding: 20px;
+  column-gap: 12px;
+  row-gap: 8px;
+  padding: 12px 16px;
   text-align: left;
   border-radius: 24px;
   background: var(--surface);
@@ -115,31 +116,36 @@ ul {
 }
 
 .routine-icon {
-  grid-row: 1;
-  font-size: 64px;
+  grid-row: 1 / span 2;
+  grid-column: 1;
+  font-size: 52px;
   line-height: 1;
 }
 
 .routine-name {
   grid-row: 1;
-  font-size: 36px;
+  grid-column: 2;
+  align-self: end;
+  font-size: 30px;
   font-weight: 800;
+  line-height: 1.1;
 }
 
 .routine-time {
-  grid-column: 1 / -1;
-  font-size: 20px;
+  grid-row: 2;
+  grid-column: 2;
+  align-self: start;
+  font-size: 18px;
   color: var(--muted);
-  margin-bottom: 12px;
 }
 
 .routine-start {
   grid-column: 1 / -1;
   display: grid;
   place-items: center;
-  min-height: 64px;
+  min-height: 56px;
   border-radius: 16px;
-  font-size: 26px;
+  font-size: 24px;
   font-weight: 800;
   color: var(--on-accent);
   background: var(--accent);
