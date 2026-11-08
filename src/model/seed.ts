@@ -1,0 +1,72 @@
+import type { Routine, Step } from './types';
+
+// Durations and routine-level points are placeholders until they are agreed before first use.
+const PROFILE_ID = 'default';
+
+const morningSteps: Step[] = [
+  {
+    id: 'medication',
+    order: 0,
+    name: 'Medication',
+    icon: { kind: 'emoji', value: '💊' },
+    type: 'checkbox',
+    plannedSeconds: 0,
+    earliestDoneSeconds: 0,
+    points: 5,
+  },
+  {
+    id: 'tooth-brushing',
+    order: 1,
+    name: 'Tooth brushing',
+    icon: { kind: 'emoji', value: '🪥' },
+    type: 'timed',
+    plannedSeconds: 3 * 60,
+    earliestDoneSeconds: 90,
+    points: 10,
+  },
+  {
+    id: 'combing',
+    order: 2,
+    name: 'Combing',
+    icon: { kind: 'emoji', value: '💇' },
+    type: 'timed',
+    plannedSeconds: 2 * 60,
+    earliestDoneSeconds: 30,
+    points: 5,
+  },
+  {
+    id: 'breakfast',
+    order: 3,
+    name: 'Breakfast',
+    icon: { kind: 'emoji', value: '🥣' },
+    type: 'timed',
+    plannedSeconds: 15 * 60,
+    earliestDoneSeconds: 5 * 60,
+    points: 10,
+  },
+];
+
+export const morning: Routine = {
+  id: 'morning',
+  profileId: PROFILE_ID,
+  name: 'Morning',
+  icon: { kind: 'emoji', value: '☀️' },
+  colour: '#ffc828',
+  order: 0,
+  pointsOnComplete: 10,
+  onTimeBonus: 5,
+  maxRewardedRunsPerDay: 1,
+  steps: morningSteps,
+};
+
+export const evening: Routine = {
+  ...morning,
+  id: 'evening',
+  name: 'Evening',
+  icon: { kind: 'emoji', value: '🌙' },
+  colour: '#8080ff',
+  order: 1,
+  steps: [...morningSteps].reverse().map((step, order) => ({ ...step, order })),
+};
+
+export const routines: Routine[] = [morning, evening];

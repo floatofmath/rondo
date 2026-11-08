@@ -1,28 +1,531 @@
 :root {
-  color-scheme: dark;
-  --bg: #14141c;
-  --fg: #f5f5f7;
+  color-scheme: light dark;
+  --bg: #f7f7fa;
+  --surface: #ffffff;
+  --surface-strong: #e4e4ec;
+  --fg: #14141c;
+  --muted: #5c5c6e;
+  --disc: #4a4a5e;
+  --amber: #e08600;
+  --red: #d42a2a;
+  --green: #1c8a4a;
+  --on-accent: #14141c;
+  --accent: #ffc828;
+  --touch: 56px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #14141c;
+    --surface: #22222e;
+    --surface-strong: #3a3a4a;
+    --fg: #f5f5f7;
+    --muted: #a8a8ba;
+    --disc: #d6d6e2;
+    --amber: #ffa928;
+    --red: #ff5a52;
+    --green: #4ad07f;
+  }
 }
 
 * {
   box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
 }
 
 html,
 body,
-#root {
+#root,
+.app {
   height: 100%;
   margin: 0;
+}
+
+html,
+body {
+  overflow: hidden;
+  overscroll-behavior: none;
 }
 
 body {
   background: var(--bg);
   color: var(--fg);
   font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  touch-action: manipulation;
 }
 
-.shell {
+/* The status bar has light text in every theme, so keep it on a dark band. */
+.app::before {
+  content: '';
+  position: fixed;
+  inset: 0 0 auto;
+  height: env(safe-area-inset-top);
+  background: #14141c;
+  z-index: 3;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  border: 0;
+  cursor: pointer;
+  background: none;
+}
+
+h1,
+p,
+ul {
+  margin: 0;
+  padding: 0;
+}
+
+ul {
+  list-style: none;
+}
+
+.screen {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: calc(env(safe-area-inset-top) + 16px) calc(env(safe-area-inset-right) + 16px)
+    calc(env(safe-area-inset-bottom) + 16px) calc(env(safe-area-inset-left) + 16px);
+}
+
+/* Home */
+.home {
+  gap: 16px;
+}
+
+.routine-card {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: 1fr auto auto;
+  align-items: center;
+  column-gap: 16px;
+  padding: 20px;
+  text-align: left;
+  border-radius: 24px;
+  background: var(--surface);
+  border: 3px solid var(--accent);
+}
+
+.routine-icon {
+  grid-row: 1;
+  font-size: 64px;
+  line-height: 1;
+}
+
+.routine-name {
+  grid-row: 1;
+  font-size: 36px;
+  font-weight: 800;
+}
+
+.routine-time {
+  grid-column: 1 / -1;
+  font-size: 20px;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+
+.routine-start {
+  grid-column: 1 / -1;
   display: grid;
   place-items: center;
+  min-height: 64px;
+  border-radius: 16px;
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--on-accent);
+  background: var(--accent);
+}
+
+.text-button {
+  min-height: var(--touch);
+  font-size: 18px;
+  color: var(--muted);
+}
+
+/* Runner */
+.runner {
+  gap: 8px;
+}
+
+.runner-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.segments {
+  flex: 1;
+  display: flex;
+  gap: 4px;
+}
+
+.segment {
+  flex: 1;
+  height: 12px;
+  overflow: hidden;
+  border-radius: 6px;
+  background: var(--surface-strong);
+}
+
+.segment-fill {
   height: 100%;
+  background: var(--accent);
+}
+
+.segment-current {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.segment-skipped {
+  background: repeating-linear-gradient(
+    -45deg,
+    var(--surface-strong) 0 4px,
+    transparent 4px 8px
+  );
+}
+
+.step-counter {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.runner-centre {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  text-align: center;
+}
+
+.step-icon {
+  font-size: clamp(48px, 10vh, 96px);
+  line-height: 1.1;
+}
+
+.step-name {
+  font-size: clamp(26px, 4.5vh, 36px);
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.disc {
+  width: min(62vw, 30vh);
+  height: min(62vw, 30vh);
+  margin: 8px 0 0;
+  flex: none;
+}
+
+.disc-track {
+  fill: var(--surface-strong);
+}
+
+.disc-fill {
+  fill: var(--disc);
+}
+
+.disc-amber .disc-fill {
+  fill: var(--amber);
+}
+
+.disc-over .disc-track {
+  fill: var(--red);
+}
+
+.digits {
+  font-size: clamp(56px, 10vh, 84px);
+  font-weight: 800;
+  line-height: 1.05;
+  font-variant-numeric: tabular-nums;
+}
+
+.digits-over {
+  color: var(--red);
+}
+
+.target-line {
+  font-size: 18px;
+  color: var(--muted);
+}
+
+.is-paused .disc,
+.is-paused .digits {
+  opacity: 0.45;
+}
+
+.runner-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.done-button {
+  position: relative;
+  flex: none;
+  width: 100%;
+  min-height: 88px;
+  border-radius: 24px;
+  font-size: 36px;
+  font-weight: 800;
+  color: var(--on-accent);
+  background: var(--accent);
+}
+
+.done-button:disabled {
+  color: var(--muted);
+  background: var(--surface-strong);
+}
+
+.done-lock {
+  position: absolute;
+  left: 24px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 22px;
+  opacity: 0.7;
+}
+
+.secondary-controls {
+  display: flex;
+  gap: 12px;
+}
+
+.icon-button {
+  flex: 1;
+  min-width: var(--touch);
+  min-height: var(--touch);
+  border-radius: 16px;
+  font-size: 22px;
+  color: var(--fg);
+  background: var(--surface);
+}
+
+.icon-button-wide {
+  flex: 1.6;
+}
+
+.confirm {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 16px 16px calc(env(safe-area-inset-bottom) + 16px);
+  background: var(--bg);
+}
+
+.confirm-text {
+  flex: 1;
+  display: grid;
+  place-items: center;
+  font-size: 32px;
+  font-weight: 800;
+}
+
+.confirm-yes,
+.confirm-no {
+  min-height: 72px;
+  border-radius: 20px;
+  font-size: 26px;
+  font-weight: 800;
+}
+
+.confirm-yes {
+  background: var(--surface-strong);
+}
+
+.confirm-no {
+  color: var(--on-accent);
+  background: var(--accent);
+}
+
+/* Celebration */
+.celebration {
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+}
+
+.big-check {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: min(32vw, 16vh);
+  height: min(32vw, 16vh);
+  font-size: min(20vw, 10vh);
+  font-weight: 800;
+  border-radius: 50%;
+  color: var(--on-accent);
+  background: var(--accent);
+}
+
+.celebration-title {
+  font-size: 30px;
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+.celebration-total {
+  font-size: 36px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.celebration-total span {
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.step-list {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.step-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 48px;
+  text-align: left;
+  font-size: 18px;
+}
+
+.step-row-icon {
+  font-size: 26px;
+}
+
+.step-row-name {
+  flex: 1;
+}
+
+.mark {
+  font-weight: 700;
+}
+
+.mark-early,
+.mark-on-time {
+  color: var(--green);
+}
+
+.mark-over {
+  color: var(--red);
+}
+
+.mark-skipped {
+  color: var(--muted);
+}
+
+.warning {
+  color: var(--red);
+  font-weight: 700;
+}
+
+/* History */
+.history {
+  gap: 12px;
+}
+
+.history-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.history-header .icon-button {
+  flex: none;
+}
+
+.history-header h1 {
+  font-size: 30px;
+  font-weight: 800;
+}
+
+.history-list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.history-empty {
+  padding: 32px 0;
+  text-align: center;
+  color: var(--muted);
+  font-size: 18px;
+}
+
+.history-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 64px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--surface-strong);
+}
+
+.history-icon {
+  font-size: 30px;
+}
+
+.history-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.history-name,
+.history-time {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.history-time {
+  font-variant-numeric: tabular-nums;
+}
+
+.history-date,
+.history-note {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.history-stats {
+  text-align: right;
+}
+
+/* Portrait only: iOS ignores the manifest orientation for home-screen apps. */
+.rotate-hint {
+  display: none;
+}
+
+@media (orientation: landscape) and (max-height: 500px) {
+  .rotate-hint {
+    position: fixed;
+    inset: 0;
+    z-index: 4;
+    display: grid;
+    place-items: center;
+    font-size: 72px;
+    background: var(--bg);
+  }
 }
