@@ -560,17 +560,33 @@ describe('seed', () => {
   it('has the morning steps in the agreed order, with the agreed rules', () => {
     expect(morning.steps.map((s) => [s.id, s.type, s.plannedSeconds, s.earliestDoneSeconds, s.points])).toEqual([
       ['medication', 'checkbox', 0, 0, 5],
+      ['breakfast', 'timed', 900, 300, 10],
+      ['get-dressed', 'timed', 300, 60, 5],
+      ['fetch-school-bag', 'timed', 120, 30, 5],
       ['tooth-brushing', 'timed', 180, 90, 10],
       ['combing', 'timed', 120, 30, 5],
-      ['breakfast', 'timed', 900, 300, 10],
     ]);
-    expect(routinePlannedSeconds(morning)).toBe(1200);
+    expect(routinePlannedSeconds(morning)).toBe(1620);
   });
 
-  it('has evening as morning reversed, and runs it in that order', () => {
-    const ids = morning.steps.map((s) => s.id);
-    expect(evening.steps.map((s) => s.id)).toEqual([...ids].reverse());
-    expect(createRun(evening, T0).stepRuns.map((s) => s.stepId)).toEqual([...ids].reverse());
+  it('has its own evening steps, and runs them in that order', () => {
+    const ids = [
+      'tooth-brushing',
+      'combing',
+      'pyjamas',
+      'lay-out-clothes',
+      'pack-school-bag',
+      'put-away-laundry',
+    ];
+    expect(evening.steps.map((s) => s.id)).toEqual(ids);
+    expect(evening.steps.map((s) => s.order)).toEqual([0, 1, 2, 3, 4, 5]);
+    expect(createRun(evening, T0).stepRuns.map((s) => s.stepId)).toEqual(ids);
+    expect(routinePlannedSeconds(evening)).toBe(1080);
+  });
+
+  it('keeps the shared steps in each routine at their own position', () => {
+    expect(morning.steps.find((s) => s.id === 'combing')!.order).toBe(5);
+    expect(evening.steps.find((s) => s.id === 'combing')!.order).toBe(1);
   });
 
   it('has the study routine with the agreed durations in order', () => {

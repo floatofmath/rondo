@@ -1,50 +1,47 @@
-import type { Routine, Step } from './types';
+import type { Routine, Step, StepType } from './types';
 
-// Durations and routine-level points are placeholders until they are agreed before first use.
+// Durations, minimum times and points are placeholders until they are agreed before first use.
 const PROFILE_ID = 'default';
 
-const morningSteps: Step[] = [
-  {
-    id: 'medication',
-    order: 0,
-    name: 'Medikament',
-    icon: { kind: 'emoji', value: '💊' },
-    type: 'checkbox',
-    plannedSeconds: 0,
-    earliestDoneSeconds: 0,
-    points: 5,
-  },
-  {
-    id: 'tooth-brushing',
-    order: 1,
-    name: 'Zähne putzen',
-    icon: { kind: 'emoji', value: '🪥' },
-    type: 'timed',
-    plannedSeconds: 3 * 60,
-    earliestDoneSeconds: 90,
-    points: 10,
-  },
-  {
-    id: 'combing',
-    order: 2,
-    name: 'Haare kämmen',
-    icon: { kind: 'emoji', value: '💇' },
-    type: 'timed',
-    plannedSeconds: 2 * 60,
-    earliestDoneSeconds: 30,
-    points: 5,
-  },
-  {
-    id: 'breakfast',
-    order: 3,
-    name: 'Frühstück',
-    icon: { kind: 'emoji', value: '🥣' },
-    type: 'timed',
-    plannedSeconds: 15 * 60,
-    earliestDoneSeconds: 5 * 60,
-    points: 10,
-  },
-];
+const minutes = (count: number) => count * 60;
+
+type StepPlan = {
+  id: string;
+  name: string;
+  emoji: string;
+  plannedSeconds: number;
+  earliestDoneSeconds: number;
+  points: number;
+  type?: StepType;
+};
+
+function steps(plans: StepPlan[]): Step[] {
+  return plans.map(({ emoji, type = 'timed', ...plan }, order) => ({
+    ...plan,
+    order,
+    type,
+    icon: { kind: 'emoji', value: emoji },
+  }));
+}
+
+// Shared by morning and evening.
+const toothBrushing: StepPlan = {
+  id: 'tooth-brushing',
+  name: 'Zähneputzen',
+  emoji: '🪥',
+  plannedSeconds: minutes(3),
+  earliestDoneSeconds: 90,
+  points: 10,
+};
+
+const combing: StepPlan = {
+  id: 'combing',
+  name: 'Kämmen',
+  emoji: '🪮',
+  plannedSeconds: minutes(2),
+  earliestDoneSeconds: 30,
+  points: 5,
+};
 
 export const morning: Routine = {
   id: 'morning',
@@ -56,20 +53,92 @@ export const morning: Routine = {
   pointsOnComplete: 10,
   onTimeBonus: 5,
   maxRewardedRunsPerDay: 1,
-  steps: morningSteps,
+  steps: steps([
+    {
+      id: 'medication',
+      name: 'Medikamente',
+      emoji: '💊',
+      type: 'checkbox',
+      plannedSeconds: 0,
+      earliestDoneSeconds: 0,
+      points: 5,
+    },
+    {
+      id: 'breakfast',
+      name: 'Frühstücken',
+      emoji: '🥣',
+      plannedSeconds: minutes(15),
+      earliestDoneSeconds: minutes(5),
+      points: 10,
+    },
+    {
+      id: 'get-dressed',
+      name: 'Anziehen',
+      emoji: '👕',
+      plannedSeconds: minutes(5),
+      earliestDoneSeconds: minutes(1),
+      points: 5,
+    },
+    {
+      id: 'fetch-school-bag',
+      name: 'Schultasche holen',
+      emoji: '🎒',
+      plannedSeconds: minutes(2),
+      earliestDoneSeconds: 30,
+      points: 5,
+    },
+    toothBrushing,
+    combing,
+  ]),
 };
 
 export const evening: Routine = {
-  ...morning,
   id: 'evening',
+  profileId: PROFILE_ID,
   name: 'Abend',
   icon: { kind: 'emoji', value: '🌙' },
   colour: '#8080ff',
   order: 1,
-  steps: [...morningSteps].reverse().map((step, order) => ({ ...step, order })),
+  pointsOnComplete: 10,
+  onTimeBonus: 5,
+  maxRewardedRunsPerDay: 1,
+  steps: steps([
+    toothBrushing,
+    combing,
+    {
+      id: 'pyjamas',
+      name: 'Pyjama anziehen',
+      emoji: '🛌',
+      plannedSeconds: minutes(3),
+      earliestDoneSeconds: 30,
+      points: 5,
+    },
+    {
+      id: 'lay-out-clothes',
+      name: 'Kleidung für den nächsten Tag richten',
+      emoji: '🧦',
+      plannedSeconds: minutes(3),
+      earliestDoneSeconds: 30,
+      points: 5,
+    },
+    {
+      id: 'pack-school-bag',
+      name: 'Schultasche vorbereiten',
+      emoji: '🎒',
+      plannedSeconds: minutes(5),
+      earliestDoneSeconds: minutes(1),
+      points: 5,
+    },
+    {
+      id: 'put-away-laundry',
+      name: 'Schmutzwäsche wegräumen',
+      emoji: '🧺',
+      plannedSeconds: minutes(2),
+      earliestDoneSeconds: 30,
+      points: 5,
+    },
+  ]),
 };
-
-const minutes = (count: number) => count * 60;
 
 export const study: Routine = {
   id: 'study',
@@ -81,58 +150,48 @@ export const study: Routine = {
   pointsOnComplete: 10,
   onTimeBonus: 5,
   maxRewardedRunsPerDay: 1,
-  steps: [
+  steps: steps([
     {
       id: 'prepare-materials',
-      order: 0,
       name: 'Material vorbereiten',
-      icon: { kind: 'emoji', value: '🎒' },
-      type: 'timed',
+      emoji: '🎒',
       plannedSeconds: minutes(5),
       earliestDoneSeconds: minutes(1),
       points: 5,
     },
     {
       id: 'study-1',
-      order: 1,
       name: 'Lernen',
-      icon: { kind: 'emoji', value: '📚' },
-      type: 'timed',
+      emoji: '📚',
       plannedSeconds: minutes(15),
       earliestDoneSeconds: minutes(10),
       points: 10,
     },
     {
       id: 'break',
-      order: 2,
       name: 'Pause',
-      icon: { kind: 'emoji', value: '🧃' },
-      type: 'timed',
+      emoji: '🧃',
       plannedSeconds: minutes(5),
       earliestDoneSeconds: 0,
       points: 0,
     },
     {
       id: 'study-2',
-      order: 3,
       name: 'Lernen',
-      icon: { kind: 'emoji', value: '📚' },
-      type: 'timed',
+      emoji: '📚',
       plannedSeconds: minutes(15),
       earliestDoneSeconds: minutes(10),
       points: 10,
     },
     {
       id: 'clean-up',
-      order: 4,
       name: 'Aufräumen',
-      icon: { kind: 'emoji', value: '🧹' },
-      type: 'timed',
+      emoji: '🧹',
       plannedSeconds: minutes(5),
       earliestDoneSeconds: minutes(1),
       points: 5,
     },
-  ],
+  ]),
 };
 
 export const routines: Routine[] = [morning, evening, study];

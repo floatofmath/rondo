@@ -220,21 +220,30 @@ ul {
 }
 
 .step-icon {
+  flex: none;
   font-size: clamp(48px, 10vh, 96px);
   line-height: 1.1;
 }
 
 .step-name {
+  flex: none;
   font-size: clamp(26px, 4.5vh, 36px);
   font-weight: 800;
   line-height: 1.1;
+  text-wrap: balance;
 }
 
+.step-name-long {
+  font-size: clamp(22px, 3.4vh, 28px);
+}
+
+/* The disc takes the space left over, so long names and previews can never push content apart. */
 .disc {
-  width: min(62vw, 26vh);
-  height: min(62vw, 26vh);
+  flex: 1 1 0;
+  width: 100%;
+  min-height: 0;
+  max-height: min(62vw, 26vh);
   margin: 8px 0 0;
-  flex: none;
 }
 
 .disc-track {
@@ -254,6 +263,7 @@ ul {
 }
 
 .digits {
+  flex: none;
   font-size: clamp(56px, 10vh, 84px);
   font-weight: 800;
   line-height: 1.05;
@@ -338,17 +348,17 @@ ul {
   gap: 8px;
   min-height: 28px;
   font-size: 18px;
+  line-height: 1.2;
 }
 
 .next-step-label {
+  flex: none;
   color: var(--muted);
 }
 
 .next-step-name {
   font-weight: 700;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  text-wrap: balance;
 }
 
 .confirm {

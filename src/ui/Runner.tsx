@@ -22,6 +22,8 @@ const TICK_MS = 250;
 const AMBER_FRACTION = 0.2;
 /** Keeps a double tap on Done from also finishing a following step that has no minimum time. */
 const DONE_GUARD_MS = 800;
+/** Names beyond this no longer fit on one or two large lines on a small phone. */
+const LONG_NAME_LENGTH = 18;
 
 interface Props {
   run: RoutineRun;
@@ -128,7 +130,9 @@ export function Runner({ run, onChange }: Props) {
         <div className="step-icon" aria-hidden="true">
           {step.icon.value}
         </div>
-        <h1 className="step-name">{step.name}</h1>
+        <h1 className={`step-name${step.name.length > LONG_NAME_LENGTH ? ' step-name-long' : ''}`}>
+          {step.name}
+        </h1>
         {step.timed && (
           <>
             <Disc fraction={view.fractionRemaining} tone={discTone(view)} />
