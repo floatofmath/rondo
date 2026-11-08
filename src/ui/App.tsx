@@ -105,9 +105,6 @@ export function App() {
         <Celebration run={run} saveFailed={saveFailed} onHome={goHome} />
       )}
       {screen === 'history' && <History onBack={goHome} />}
-      <div className="rotate-hint" aria-hidden="true">
-        🔄
-      </div>
     </div>
   );
 }

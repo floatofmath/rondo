@@ -19,7 +19,7 @@ export default defineConfig({
         start_url: '/rondo/',
         scope: '/rondo/',
         display: 'standalone',
-        orientation: 'portrait',
+        orientation: 'any',
         theme_color: '#14141c',
         background_color: '#14141c',
         icons: [

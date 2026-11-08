@@ -83,3 +83,9 @@ Why: German is the only language needed now, and a typed object in `src/i18n/mes
 that without a dependency. Routine and step names are data, not catalogue entries.
 Exit path: add a catalogue per language and choose by device or setting; the `Messages` type makes
 missing strings a compile error. Move to a library only if plurals or many languages require it.
+
+## D17 — Both orientations, on phones and tablets (2026-11-08)
+Why: the app is also used on a tablet that is rarely held upright, and on Android as well as iOS.
+A locked portrait layout does not fit that. The manifest allows any orientation; CSS gives
+landscape a two-column layout using only an orientation media query, with no JavaScript.
+Exit path: set `orientation` in the manifest back to `portrait` and remove the media query.

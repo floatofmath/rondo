@@ -104,7 +104,7 @@ ul {
   min-height: 0;
   display: grid;
   grid-template-columns: auto 1fr;
-  grid-template-rows: 1fr auto;
+  grid-template-rows: minmax(0, 1fr) auto auto minmax(0, 1fr) auto;
   align-items: center;
   column-gap: 12px;
   row-gap: 8px;
@@ -116,14 +116,14 @@ ul {
 }
 
 .routine-icon {
-  grid-row: 1 / span 2;
+  grid-row: 2 / span 2;
   grid-column: 1;
   font-size: 52px;
   line-height: 1;
 }
 
 .routine-name {
-  grid-row: 1;
+  grid-row: 2;
   grid-column: 2;
   align-self: end;
   font-size: 30px;
@@ -132,7 +132,7 @@ ul {
 }
 
 .routine-time {
-  grid-row: 2;
+  grid-row: 3;
   grid-column: 2;
   align-self: start;
   font-size: 18px;
@@ -140,6 +140,7 @@ ul {
 }
 
 .routine-start {
+  grid-row: 5;
   grid-column: 1 / -1;
   display: grid;
   place-items: center;
@@ -555,19 +556,316 @@ ul {
   text-align: right;
 }
 
-/* Portrait only: iOS ignores the manifest orientation for home-screen apps. */
-.rotate-hint {
-  display: none;
+/* Landscape: phones held sideways and tablets. Sizes follow the short side of the screen. */
+@media (orientation: landscape) {
+  .done-button {
+    min-height: clamp(56px, 16vh, 120px);
+    font-size: clamp(26px, 6vh, 56px);
+  }
+
+  .icon-button {
+    min-height: clamp(56px, 10vh, 88px);
+    font-size: clamp(22px, 4vh, 40px);
+  }
+
+  .later-button {
+    font-size: clamp(17px, 3.2vh, 32px);
+  }
+
+  .text-button {
+    font-size: clamp(18px, 3vh, 30px);
+  }
+
+  .home {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-rows: minmax(0, 1fr) auto;
+  }
+
+  .home .text-button {
+    grid-column: 1 / -1;
+  }
+
+  .routine-card {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) auto auto auto minmax(0, 1fr) auto;
+    justify-items: center;
+    text-align: center;
+  }
+
+  .routine-icon {
+    grid-column: 1;
+    grid-row: 2;
+    font-size: clamp(36px, 15vh, 128px);
+  }
+
+  .routine-name {
+    grid-column: 1;
+    grid-row: 3;
+    font-size: clamp(22px, 6vh, 56px);
+  }
+
+  .routine-time {
+    grid-column: 1;
+    grid-row: 4;
+    font-size: clamp(16px, 3.4vh, 32px);
+  }
+
+  .routine-start {
+    grid-column: 1;
+    grid-row: 6;
+    width: 100%;
+    min-height: clamp(56px, 12vh, 96px);
+    font-size: clamp(22px, 5vh, 44px);
+  }
+
+  /* Runner: the disc fills the left half, the step and its controls fill the right. */
+  .runner {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    grid-template-rows: auto auto minmax(0, 1fr) auto auto auto auto;
+    column-gap: clamp(12px, 2vw, 32px);
+    row-gap: 8px;
+  }
+
+  .runner-top {
+    grid-column: 1 / -1;
+  }
+
+  .runner-centre,
+  .runner-controls {
+    display: contents;
+  }
+
+  .disc {
+    grid-column: 1;
+    grid-row: 2 / -1;
+    align-self: stretch;
+    height: 100%;
+    max-height: none;
+    margin: 0;
+  }
+
+  .step-icon {
+    grid-column: 2;
+    grid-row: 2;
+    align-self: center;
+    font-size: clamp(36px, 11vh, 110px);
+    line-height: 1;
+  }
+
+  .step-name,
+  .step-name-long {
+    grid-column: 3;
+    grid-row: 2;
+    align-self: center;
+    text-align: left;
+    font-size: clamp(22px, 6vh, 52px);
+  }
+
+  .step-name-long {
+    font-size: clamp(18px, 4.5vh, 40px);
+  }
+
+  .digits {
+    grid-column: 2 / -1;
+    grid-row: 3;
+    align-self: center;
+    justify-self: center;
+    font-size: clamp(48px, 17vh, 150px);
+  }
+
+  .target-line {
+    grid-column: 2 / -1;
+    grid-row: 4;
+    text-align: center;
+  }
+
+  .next-step {
+    grid-column: 2 / -1;
+    grid-row: 5;
+    font-size: clamp(16px, 3.6vh, 34px);
+  }
+
+  .done-button {
+    grid-column: 2 / -1;
+    grid-row: 6;
+  }
+
+  .secondary-controls {
+    grid-column: 2 / -1;
+    grid-row: 7;
+  }
+
+  /* A step without a timer has no disc, so its content takes the whole width. */
+  .runner:not(:has(.disc)) {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .runner:not(:has(.disc)) .step-icon {
+    grid-column: 1;
+    grid-row: 2 / 4;
+    font-size: clamp(64px, 26vh, 200px);
+  }
+
+  .runner:not(:has(.disc)) .step-name {
+    grid-column: 2;
+    grid-row: 2 / 4;
+    font-size: clamp(30px, 10vh, 80px);
+  }
+
+  .runner:not(:has(.disc)) .next-step,
+  .runner:not(:has(.disc)) .done-button,
+  .runner:not(:has(.disc)) .secondary-controls,
+  .runner:not(:has(.disc)) .target-line {
+    grid-column: 1 / -1;
+  }
+
+  .confirm {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: minmax(0, 1fr) auto;
+  }
+
+  .confirm-text {
+    grid-column: 1 / -1;
+  }
+
+  /* Celebration: result and Home on the left, the step list on the right. */
+  .celebration {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-rows: auto auto auto minmax(0, 1fr) auto;
+    column-gap: clamp(16px, 3vw, 48px);
+    row-gap: 8px;
+    justify-items: center;
+  }
+
+  .big-check,
+  .celebration-title,
+  .celebration-total,
+  .celebration .warning,
+  .celebration .done-button {
+    grid-column: 1;
+  }
+
+  .celebration .warning {
+    grid-row: 4;
+  }
+
+  .celebration .done-button {
+    grid-row: 5;
+  }
+
+  .big-check {
+    width: min(20vw, 22vh);
+    height: min(20vw, 22vh);
+    font-size: min(13vw, 14vh);
+  }
+
+  .celebration-title {
+    font-size: clamp(22px, 6vh, 48px);
+  }
+
+  .celebration-total {
+    font-size: clamp(28px, 7vh, 60px);
+  }
+
+  .celebration-total span {
+    font-size: 0.62em;
+  }
+
+  .step-list {
+    grid-column: 2;
+    grid-row: 1 / -1;
+    align-self: center;
+    max-height: 100%;
+  }
+
+  .step-row {
+    min-height: clamp(36px, 8vh, 72px);
+    font-size: clamp(16px, 3.4vh, 32px);
+  }
+
+  .step-row-icon {
+    font-size: clamp(22px, 5vh, 44px);
+  }
 }
 
-@media (orientation: landscape) and (max-height: 500px) {
-  .rotate-hint {
-    position: fixed;
-    inset: 0;
-    z-index: 4;
-    display: grid;
-    place-items: center;
-    font-size: 72px;
-    background: var(--bg);
+/* Upright tablets: the phone layout, with the small text and controls scaled up. */
+@media (orientation: portrait) and (min-width: 600px) {
+  .routine-card {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) auto auto auto minmax(0, 1fr) auto;
+    justify-items: center;
+    text-align: center;
+  }
+
+  .routine-icon {
+    grid-column: 1;
+    grid-row: 2;
+    font-size: 96px;
+  }
+
+  .routine-name {
+    grid-column: 1;
+    grid-row: 3;
+    font-size: 48px;
+  }
+
+  .routine-time {
+    grid-column: 1;
+    grid-row: 4;
+  }
+
+  .routine-start {
+    grid-column: 1;
+    grid-row: 6;
+    width: 100%;
+    min-height: 80px;
+  }
+
+  .disc {
+    max-height: min(70vw, 38vh);
+  }
+
+  .routine-time,
+  .next-step,
+  .target-line,
+  .step-counter,
+  .step-row {
+    font-size: 26px;
+  }
+
+  .routine-start,
+  .text-button,
+  .later-button {
+    font-size: 28px;
+  }
+
+  .step-name {
+    font-size: 52px;
+  }
+
+  .step-name-long {
+    font-size: 40px;
+  }
+
+  .digits {
+    font-size: 110px;
+  }
+
+  .done-button {
+    min-height: 112px;
+    font-size: 48px;
+  }
+
+  .icon-button {
+    min-height: 80px;
+    font-size: 32px;
+  }
+
+  .step-row-icon {
+    font-size: 36px;
   }
 }
