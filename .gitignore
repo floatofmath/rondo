@@ -1,0 +1,12 @@
+node_modules/
+dist/
+dev-dist/
+.DS_Store
+*.local
+.claude/settings.local.json
+
+# Family-specific docs stay on this Mac, never in the public repo
+PLAN.md
+CLAUDE.md
+docs/phase0-spec.md
+docs/feedback.md
