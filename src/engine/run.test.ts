@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { evening, morning, routines } from '../model/seed';
 import type { Routine } from '../model/types';
-import { formatDuration, formatPlanned, formatRemaining } from './format';
+import { formatDuration, formatRemaining } from './format';
 import {
   abandon,
   completeStep,
@@ -9,6 +9,7 @@ import {
   cueEvents,
   goBack,
   pause,
+  postponeStep,
   resume,
   routinePlannedSeconds,
   skipStep,
@@ -260,6 +261,114 @@ describe('goBack', () => {
   });
 });
 
+describe('postponeStep', () => {
+  const ids = (run: RunState) => run.stepRuns.map((s) => s.stepId);
+
+  it('moves the current step to the end and starts the next one', () => {
+    const run = postponeStep(createRun(threeSteps, T0), sec(10));
+    expect(ids(run)).toEqual(['b', 'c', 'a']);
+    expect(run.currentStepIndex).toBe(0);
+    expect(run.stepRuns[0]!.startedAt).toBe(sec(10));
+    expect(tick(run, sec(20)).remainingSeconds).toBe(110);
+  });
+
+  it('moves a later step behind the remaining steps only', () => {
+    let run = completeStep(createRun(threeSteps, T0), sec(100));
+    run = postponeStep(run, sec(110));
+    expect(ids(run)).toEqual(['a', 'c', 'b']);
+    expect(run.currentStepIndex).toBe(1);
+  });
+
+  it('continues the postponed step with its elapsed preserved', () => {
+    let run = postponeStep(createRun(threeSteps, T0), sec(40));
+    run = completeStep(run, sec(100));
+    run = completeStep(run, sec(150));
+    expect(run.stepRuns[2]!.stepId).toBe('a');
+    expect(tick(run, sec(150)).remainingSeconds).toBe(140);
+    expect(tick(run, sec(160)).remainingSeconds).toBe(130);
+  });
+
+  it('counts only time actually spent on the step toward earliestDone and actual time', () => {
+    let run = postponeStep(createRun(threeSteps, T0), sec(40));
+    run = completeStep(run, sec(100));
+    run = completeStep(run, sec(150));
+    expect(() => completeStep(run, sec(160))).toThrow();
+    run = completeStep(run, sec(200));
+    expect(run.status).toBe('done');
+    expect(stepActualSeconds(run.stepRuns[2]!)).toBe(90);
+  });
+
+  it('does nothing on the last step', () => {
+    const last = completeStep(createRun(routineOf(step('a', 10), step('b', 10)), T0), sec(10));
+    expect(postponeStep(last, sec(11))).toBe(last);
+  });
+
+  it('can be used again, and returns to the first step when all are postponed', () => {
+    let run = createRun(routineOf(step('a', 100), step('b', 100)), T0);
+    run = postponeStep(run, sec(10));
+    run = postponeStep(run, sec(30));
+    expect(ids(run)).toEqual(['a', 'b']);
+    expect(tick(run, sec(30)).remainingSeconds).toBe(90);
+    expect(tick(run, sec(30)).stepViews[1]!.remainingSeconds).toBe(80);
+  });
+
+  it('works from a paused step and leaves the next step running', () => {
+    let run = pause(createRun(threeSteps, T0), sec(10));
+    run = postponeStep(run, sec(50));
+    expect(run.status).toBe('running');
+    expect(tick(run, sec(50)).stepViews[2]!.elapsedSeconds).toBe(10);
+  });
+
+  it('keeps the postponed step pending and works with goBack', () => {
+    let run = completeStep(createRun(threeSteps, T0), sec(100));
+    run = postponeStep(run, sec(110));
+    expect(tick(run, sec(110)).stepViews[2]!.phase).toBe('pending');
+    run = goBack(run, sec(120));
+    expect(run.stepRuns[0]!.stepId).toBe('a');
+    expect(tick(run, sec(120)).stepViews.map((s) => s.phase)).toEqual(['current', 'pending', 'pending']);
+  });
+
+  it('does not change the routine it came from', () => {
+    const before = threeSteps.steps.map((s) => s.id);
+    postponeStep(createRun(threeSteps, T0), sec(1));
+    expect(threeSteps.steps.map((s) => s.id)).toEqual(before);
+  });
+
+  it('is rejected after the run has ended', () => {
+    expect(() => postponeStep(abandon(createRun(threeSteps, T0), sec(1)), sec(2))).toThrow();
+  });
+
+  it('fires no false cue when a different step takes the same index', () => {
+    const run = createRun(routineOf(step('a', 180), step('b', 60)), T0);
+    const before = tick(run, sec(10));
+    const moved = postponeStep(run, sec(10));
+    expect(cueEvents(before, tick(moved, sec(10)))).toEqual([]);
+  });
+
+  it('fires each cue once per step across a postpone and return', () => {
+    let run = createRun(routineOf(step('a', 100), step('b', 100)), T0);
+    const events: CueEvent[] = [];
+    let prev = tick(run, T0);
+    const advance = (t: number) => {
+      const next = tick(run, sec(t));
+      events.push(...cueEvents(prev, next));
+      prev = next;
+    };
+    advance(45); // a: one minute
+    run = postponeStep(run, sec(45));
+    advance(45);
+    run = postponeStep(run, sec(45)); // b moves back behind a, untouched
+    advance(45);
+    advance(60); // a: half time
+    run = postponeStep(run, sec(60));
+    advance(60);
+    run = postponeStep(run, sec(60));
+    advance(60);
+    advance(100); // a: step end
+    expect(events).toEqual(['oneMinute', 'halfTime', 'stepEnd']);
+  });
+});
+
 describe('end of run', () => {
   const finished = (): RunState => {
     let run = createRun(threeSteps, T0);
@@ -484,7 +593,5 @@ describe('format', () => {
 
   it('formats durations', () => {
     expect(formatDuration(95.4)).toBe('1:35');
-    expect(formatPlanned(1200)).toBe('20 min');
-    expect(formatPlanned(45)).toBe('45 s');
   });
 });

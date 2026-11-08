@@ -77,3 +77,9 @@ on each phone, so export data first.
 ## D15 — Planning docs stay out of the public repo (2026-11-08)
 Why: they contain household details. They are gitignored and kept on the development Mac only.
 Exit path: move them to a private repo if they need a backup.
+
+## D16 — German UI from one typed message catalogue, no i18n library (2026-11-08)
+Why: German is the only language needed now, and a typed object in `src/i18n/messages.ts` covers
+that without a dependency. Routine and step names are data, not catalogue entries.
+Exit path: add a catalogue per language and choose by device or setting; the `Messages` type makes
+missing strings a compile error. Move to a library only if plurals or many languages require it.

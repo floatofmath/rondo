@@ -7,7 +7,7 @@ const morningSteps: Step[] = [
   {
     id: 'medication',
     order: 0,
-    name: 'Medication',
+    name: 'Medikament',
     icon: { kind: 'emoji', value: '💊' },
     type: 'checkbox',
     plannedSeconds: 0,
@@ -17,7 +17,7 @@ const morningSteps: Step[] = [
   {
     id: 'tooth-brushing',
     order: 1,
-    name: 'Tooth brushing',
+    name: 'Zähne putzen',
     icon: { kind: 'emoji', value: '🪥' },
     type: 'timed',
     plannedSeconds: 3 * 60,
@@ -27,7 +27,7 @@ const morningSteps: Step[] = [
   {
     id: 'combing',
     order: 2,
-    name: 'Combing',
+    name: 'Haare kämmen',
     icon: { kind: 'emoji', value: '💇' },
     type: 'timed',
     plannedSeconds: 2 * 60,
@@ -37,7 +37,7 @@ const morningSteps: Step[] = [
   {
     id: 'breakfast',
     order: 3,
-    name: 'Breakfast',
+    name: 'Frühstück',
     icon: { kind: 'emoji', value: '🥣' },
     type: 'timed',
     plannedSeconds: 15 * 60,
@@ -49,7 +49,7 @@ const morningSteps: Step[] = [
 export const morning: Routine = {
   id: 'morning',
   profileId: PROFILE_ID,
-  name: 'Morning',
+  name: 'Morgen',
   icon: { kind: 'emoji', value: '☀️' },
   colour: '#ffc828',
   order: 0,
@@ -62,7 +62,7 @@ export const morning: Routine = {
 export const evening: Routine = {
   ...morning,
   id: 'evening',
-  name: 'Evening',
+  name: 'Abend',
   icon: { kind: 'emoji', value: '🌙' },
   colour: '#8080ff',
   order: 1,

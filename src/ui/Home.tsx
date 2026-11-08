@@ -1,6 +1,6 @@
 import type { CSSProperties } from 'react';
-import { formatPlanned } from '../engine/format';
 import { routinePlannedSeconds } from '../engine/run';
+import { t } from '../i18n/messages';
 import { routines } from '../model/seed';
 import type { Routine } from '../model/types';
 
@@ -24,12 +24,12 @@ export function Home({ onStart, onHistory }: Props) {
             {routine.icon.value}
           </span>
           <span className="routine-name">{routine.name}</span>
-          <span className="routine-time">{formatPlanned(routinePlannedSeconds(routine))}</span>
-          <span className="routine-start">Start</span>
+          <span className="routine-time">{t.home.planned(routinePlannedSeconds(routine))}</span>
+          <span className="routine-start">{t.home.start}</span>
         </button>
       ))}
       <button type="button" className="text-button" onClick={onHistory}>
-        History
+        {t.home.history}
       </button>
     </main>
   );

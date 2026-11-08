@@ -1,12 +1,13 @@
 import type { CSSProperties } from 'react';
 import { formatDuration } from '../engine/format';
 import { tick, type StepView } from '../engine/run';
+import { t } from '../i18n/messages';
 import type { RoutineRun } from '../model/types';
 
 const MARKS: Record<NonNullable<StepView['mark']>, { label: string; className: string }> = {
-  early: { label: 'Early', className: 'mark-early' },
-  onTime: { label: 'On time', className: 'mark-on-time' },
-  over: { label: 'Over', className: 'mark-over' },
+  early: { label: t.celebration.early, className: 'mark-early' },
+  onTime: { label: t.celebration.onTime, className: 'mark-on-time' },
+  over: { label: t.celebration.over, className: 'mark-over' },
 };
 
 interface Props {
@@ -25,7 +26,7 @@ export function Celebration({ run, saveFailed, onHome }: Props) {
       <div className="big-check" aria-hidden="true">
         ✓
       </div>
-      <h1 className="celebration-title">{run.routineName} routine done</h1>
+      <h1 className="celebration-title">{t.celebration.title(run.routineName)}</h1>
       <p className="celebration-total">
         {formatDuration(view.routineElapsed)} <span>/ {formatDuration(view.routinePlanned)}</span>
       </p>
@@ -39,14 +40,14 @@ export function Celebration({ run, saveFailed, onHome }: Props) {
             {step.mark ? (
               <span className={`mark ${MARKS[step.mark].className}`}>{MARKS[step.mark].label}</span>
             ) : (
-              <span className="mark mark-skipped">Skipped</span>
+              <span className="mark mark-skipped">{t.celebration.skipped}</span>
             )}
           </li>
         ))}
       </ul>
-      {saveFailed && <p className="warning">This run could not be saved.</p>}
+      {saveFailed && <p className="warning">{t.celebration.saveFailed}</p>}
       <button type="button" className="done-button" onClick={onHome}>
-        Home
+        {t.celebration.home}
       </button>
     </main>
   );

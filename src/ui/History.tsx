@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import { formatDuration } from '../engine/format';
 import { tick } from '../engine/run';
+import { t } from '../i18n/messages';
 import type { RoutineRun } from '../model/types';
 import { runRepository } from '../store/runs';
 
-const DATE_FORMAT = new Intl.DateTimeFormat(undefined, {
+const DATE_FORMAT = new Intl.DateTimeFormat(t.intlLocale, {
   weekday: 'short',
   day: 'numeric',
   month: 'short',
@@ -33,9 +34,9 @@ function RunRow({ run }: { run: RoutineRun }) {
           {formatDuration(view.routineElapsed)} / {formatDuration(view.routinePlanned)}
         </div>
         {run.status === 'abandoned' ? (
-          <div className="history-note">Stopped</div>
+          <div className="history-note">{t.history.stopped}</div>
         ) : (
-          skipped > 0 && <div className="history-note">{skipped} skipped</div>
+          skipped > 0 && <div className="history-note">{t.history.skipped(skipped)}</div>
         )}
       </div>
     </li>
@@ -59,13 +60,13 @@ export function History({ onBack }: Props) {
   return (
     <main className="screen history">
       <header className="history-header">
-        <button type="button" className="icon-button" aria-label="Back" onClick={onBack}>
+        <button type="button" className="icon-button" aria-label={t.history.back} onClick={onBack}>
           ◀︎
         </button>
-        <h1>History</h1>
+        <h1>{t.history.title}</h1>
       </header>
-      {failed && <p className="warning">History could not be loaded.</p>}
-      {runs?.length === 0 && <p className="history-empty">No runs yet</p>}
+      {failed && <p className="warning">{t.history.loadFailed}</p>}
+      {runs?.length === 0 && <p className="history-empty">{t.history.empty}</p>}
       <ul className="history-list">
         {runs?.map((run) => <RunRow key={run.id} run={run} />)}
       </ul>

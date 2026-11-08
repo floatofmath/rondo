@@ -14,8 +14,3 @@ export function formatRemaining(remainingSeconds: number): string {
 export function formatDuration(seconds: number): string {
   return clock(Math.round(seconds));
 }
-
-/** Short duration for planned totals: "20 min", "90 s". */
-export function formatPlanned(seconds: number): string {
-  return seconds < 60 ? `${seconds} s` : `${Math.round(seconds / 60)} min`;
-}

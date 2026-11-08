@@ -225,8 +225,8 @@ ul {
 }
 
 .disc {
-  width: min(62vw, 30vh);
-  height: min(62vw, 30vh);
+  width: min(62vw, 26vh);
+  height: min(62vw, 26vh);
   margin: 8px 0 0;
   flex: none;
 }
@@ -302,7 +302,7 @@ ul {
 
 .secondary-controls {
   display: flex;
-  gap: 12px;
+  gap: 8px;
 }
 
 .icon-button {
@@ -315,8 +315,34 @@ ul {
   background: var(--surface);
 }
 
-.icon-button-wide {
-  flex: 1.6;
+.icon-button:disabled {
+  opacity: 0.35;
+}
+
+.later-button {
+  flex: 1.5;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.next-step {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 28px;
+  font-size: 18px;
+}
+
+.next-step-label {
+  color: var(--muted);
+}
+
+.next-step-name {
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .confirm {

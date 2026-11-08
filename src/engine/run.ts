@@ -163,6 +163,27 @@ export function goBack(state: RunState, now: number): RunState {
   };
 }
 
+/**
+ * Moves the current step to the end of the run and starts the next one. The postponed step stops
+ * its clock and continues from there when it comes up again. Does nothing on the last step.
+ */
+export function postponeStep(state: RunState, now: number): RunState {
+  assertActive(state);
+  const index = state.currentStepIndex;
+  if (index === state.stepRuns.length - 1) return state;
+
+  const step = currentStep(state);
+  const reordered = [
+    ...state.stepRuns.filter((_, i) => i !== index),
+    { ...step, pausedAt: step.pausedAt ?? now },
+  ];
+  return {
+    ...state,
+    status: 'running',
+    stepRuns: replaceAt(reordered, index, enter(reordered[index]!, now)),
+  };
+}
+
 export function abandon(state: RunState, now: number): RunState {
   assertActive(state);
   return {
@@ -178,8 +199,10 @@ export function abandon(state: RunState, now: number): RunState {
 export function cueEvents(prev: RunView, next: RunView): CueEvent[] {
   const events: CueEvent[] = [];
   const step = next.stepViews[next.stepIndex];
+  // Compared by id: postponing puts a different step at the same index.
+  const sameStep = prev.stepViews[prev.stepIndex]?.stepId === step?.stepId;
 
-  if (step?.timed && prev.stepIndex === next.stepIndex && next.status !== 'stale') {
+  if (step?.timed && sameStep && next.status !== 'stale') {
     const thresholds: { cue: CueEvent; remaining: number }[] = [
       { cue: 'halfTime', remaining: step.plannedSeconds / 2 },
     ];

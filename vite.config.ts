@@ -13,7 +13,8 @@ export default defineConfig({
       manifest: {
         name: 'Rondo',
         short_name: 'Rondo',
-        description: 'Routine runner',
+        description: 'Routinen Schritt für Schritt',
+        lang: 'de',
         id: '/rondo/',
         start_url: '/rondo/',
         scope: '/rondo/',

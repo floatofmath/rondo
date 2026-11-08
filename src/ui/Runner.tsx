@@ -7,11 +7,13 @@ import {
   cueEvents,
   goBack,
   pause,
+  postponeStep,
   resume,
   skipStep,
   tick,
   type RunView,
 } from '../engine/run';
+import { t } from '../i18n/messages';
 import type { RoutineRun } from '../model/types';
 import { holdWakeLock } from '../pwa/wakeLock';
 import { Disc, type DiscTone } from './Disc';
@@ -69,6 +71,7 @@ export function Runner({ run, onChange }: Props) {
   }, [view.status, run, onChange]);
 
   const step = view.stepViews[view.stepIndex]!;
+  const nextStep = view.stepViews[view.stepIndex + 1];
   const paused = view.status === 'paused';
   const over = view.remainingSeconds < 0;
   const firstStep = view.stepIndex === 0;
@@ -99,16 +102,16 @@ export function Runner({ run, onChange }: Props) {
     >
       <header className="runner-top">
         <div className="segments" aria-hidden="true">
-          {view.stepViews.map((segment, i) => (
+          {view.stepViews.map((segment) => (
             <div key={segment.stepId} className={`segment segment-${segment.phase}`}>
               <div
                 className="segment-fill"
                 style={{
                   width: `${
-                    i === view.stepIndex && step.timed
-                      ? Math.round((1 - segment.fractionRemaining) * 100)
-                      : segment.phase === 'completed'
-                        ? 100
+                    segment.phase === 'completed'
+                      ? 100
+                      : segment.timed && segment.phase !== 'skipped'
+                        ? Math.round((1 - segment.fractionRemaining) * 100)
                         : 0
                   }%`,
                 }}
@@ -135,11 +138,18 @@ export function Runner({ run, onChange }: Props) {
           </>
         )}
         {run.targetEndTime && (
-          <div className="target-line">ready by {formatTarget(run.targetEndTime)}</div>
+          <div className="target-line">{t.runner.readyBy(formatTarget(run.targetEndTime))}</div>
         )}
       </section>
 
       <footer className="runner-controls">
+        {nextStep && (
+          <div className="next-step">
+            <span className="next-step-label">{t.runner.next}</span>
+            <span aria-hidden="true">{nextStep.icon.value}</span>
+            <span className="next-step-name">{nextStep.name}</span>
+          </div>
+        )}
         <button
           type="button"
           className="done-button"
@@ -147,25 +157,25 @@ export function Runner({ run, onChange }: Props) {
           onClick={done}
         >
           {!view.canComplete && !paused && (
-            <span className="done-lock" aria-label="Locked">
+            <span className="done-lock" aria-label={t.runner.locked}>
               🔒
             </span>
           )}
-          Done
+          {t.runner.done}
         </button>
         <div className="secondary-controls">
           <button
             type="button"
             className="icon-button"
-            aria-label="Back"
+            aria-label={t.runner.back}
             onClick={() => setConfirmingBack(true)}
           >
             ◀︎
           </button>
           <button
             type="button"
-            className="icon-button icon-button-wide"
-            aria-label={paused ? 'Resume' : 'Pause'}
+            className="icon-button"
+            aria-label={paused ? t.runner.resume : t.runner.pause}
             onClick={() => onChange(paused ? resume(run, Date.now()) : pause(run, Date.now()))}
           >
             {paused ? '▶︎' : '❙❙'}
@@ -173,22 +183,30 @@ export function Runner({ run, onChange }: Props) {
           <button
             type="button"
             className="icon-button"
-            aria-label="Skip"
+            aria-label={t.runner.skip}
             onClick={() => moveStep(skipStep(run, Date.now()))}
           >
             ▶︎❙
+          </button>
+          <button
+            type="button"
+            className="icon-button later-button"
+            disabled={!nextStep}
+            onClick={() => moveStep(postponeStep(run, Date.now()))}
+          >
+            {t.runner.later}
           </button>
         </div>
       </footer>
 
       {confirmingBack && (
         <div className="confirm" role="dialog" aria-modal="true">
-          <p className="confirm-text">{firstStep ? 'Stop routine?' : 'Go back a step?'}</p>
+          <p className="confirm-text">{firstStep ? t.runner.confirmStop : t.runner.confirmBack}</p>
           <button type="button" className="confirm-yes" onClick={confirmBack}>
-            Yes
+            {t.runner.yes}
           </button>
           <button type="button" className="confirm-no" onClick={() => setConfirmingBack(false)}>
-            No
+            {t.runner.no}
           </button>
         </div>
       )}
