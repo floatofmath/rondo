@@ -49,6 +49,20 @@ describe('routine points', () => {
     expect(runPoints(finishedWithin()).routine).toBe(20);
   });
 
+  it('pays nothing when every step was skipped, though the run is done', () => {
+    let run = createRun(routine, T0);
+    run = skipStep(skipStep(skipStep(run, sec(1)), sec(2)), sec(3));
+    expect(run.status).toBe('done');
+    expect(runPoints(run)).toEqual({ steps: 0, routine: 0, bonus: 0, total: 0 });
+  });
+
+  it('pays routine points when at least one step was completed', () => {
+    let run = createRun(routine, T0);
+    run = completeStep(run, sec(1));
+    run = skipStep(skipStep(run, sec(2)), sec(3));
+    expect(runPoints(run)).toEqual({ steps: 5, routine: 20, bonus: 0, total: 25 });
+  });
+
   it('pays no routine points before done', () => {
     const run = completeStep(createRun(routine, T0), sec(1));
     expect(runPoints(run)).toEqual({ steps: 5, routine: 0, bonus: 0, total: 5 });

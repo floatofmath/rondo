@@ -33,7 +33,8 @@ export function isOnTime(run: RoutineRun): boolean {
 export function runPoints(run: RoutineRun): RunPoints {
   if (!run.rewarded) return NO_POINTS;
   const steps = run.stepRuns.reduce((sum, step) => sum + stepPoints(step), 0);
-  const routine = run.status === 'done' ? run.pointsOnComplete : 0;
+  // A run that skipped every step reaches `done` but has earned nothing.
+  const routine = run.status === 'done' && run.stepRuns.some(isCompleted) ? run.pointsOnComplete : 0;
   const bonus = isOnTime(run) ? run.onTimeBonus : 0;
   return { steps, routine, bonus, total: steps + routine + bonus };
 }
